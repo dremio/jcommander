@@ -334,6 +334,19 @@ public class JCommander {
         }
     }
 
+    // similar to Java 8's String.join(...)
+    private static String join(final String separator, final Object[] objects) {
+        final StringBuilder builder = new StringBuilder();
+        final int objectsLength = objects.length;
+        for (int i = 0; i < objectsLength; i++) {
+            builder.append(objects[i]);
+            if (i + 1 != objectsLength) {
+                builder.append(separator);
+            }
+        }
+        return builder.toString();
+    }
+
     /**
      * Make sure that all the required parameters have received a value.
      */
@@ -346,9 +359,9 @@ public class JCommander {
         if (!requiredFields.isEmpty()) {
             List<String> missingFields = new ArrayList<>();
             for (ParameterDescription pd : requiredFields.values()) {
-                missingFields.add("[" + String.join(" | ", pd.getParameter().names()) + "]");
+                missingFields.add("[" + join(" | ", pd.getParameter().names()) + "]");
             }
-            String message = String.join(", ", missingFields);
+            String message = join(", ", missingFields.toArray());
             throw new ParameterException("The following "
                     + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
                     + message);
