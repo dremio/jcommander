@@ -12,7 +12,13 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version = '1.58'
+task buildInfo {
+    def cmd = "git rev-parse --short HEAD"
+    def proc = cmd.execute()
+    println "" + ((int)(new Date().getTime()/1000)) + "-" + proc.text.trim() + ""
+}
+
+version = '1.71'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'

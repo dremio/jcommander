@@ -8,7 +8,7 @@ ext {
 }
 
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
+// apply plugin: 'com.jfrog.bintray'
 
 jar {
     manifest {
@@ -18,7 +18,7 @@ jar {
             'Build-Date': project.buildTime,
             'Build-Time': project.buildDate,
             'Specification-Title': project.name,
-            'Specification-Version': project.version,
+            'Specification-Version': project.version + (project.hasProperty("versionExt") ? "-" + project.getProperty("versionExt") : ""),
         )
     }
 }
@@ -31,7 +31,7 @@ publishing {
 
             groupId 'com.beust'
             artifactId 'jcommander'
-            version project.version
+            version project.version + (project.hasProperty("versionExt") ? "-" + project.getProperty("versionExt") : "")
 
 //            pom.withXml {
 //                asNode().children().last() + pomConfig
@@ -40,24 +40,36 @@ publishing {
     }
 }
 
-task install(dependsOn: publishToMavenLocal)
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    publications = ['mavenCustom']
-    pkg {
-        repo = 'maven'
-        name = 'jcommander'
-        desc = 'Command line parsing for Java'
-        licenses = ['Apache-2.0']
-        labels = ['java']
-
-        version {
-            name = project.version //Bintray logical version name
+publishing {
+    repositories {
+        maven {
+            url (project.hasProperty("repoUrl") ? project.getProperty("repoUrl") : "")
+            credentials {
+                username (project.hasProperty("repoUser") ? project.getProperty("repoUser") : "")
+                password (project.hasProperty("repoPass") ? project.getProperty("repoPass") : "")
+            }
         }
     }
 }
+
+task install(dependsOn: publishToMavenLocal)
+
+// Properties properties = new Properties()
+// properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+// bintray {
+//     user = properties.getProperty("bintray.user")
+//     key = properties.getProperty("bintray.apikey")
+//     publications = ['mavenCustom']
+//     pkg {
+//         repo = 'maven'
+//         name = 'jcommander'
+//         desc = 'Command line parsing for Java'
+//         licenses = ['Apache-2.0']
+//         labels = ['java']
+
+//         version {
+//             name = project.version //Bintray logical version name
+//         }
+//     }
+// }
